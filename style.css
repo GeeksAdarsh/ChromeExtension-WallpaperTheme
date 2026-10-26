@@ -1,0 +1,746 @@
+:root {
+  --ink: #f6f3ec;
+  --muted: rgba(246, 243, 236, 0.52);
+  --line: rgba(246, 243, 236, 0.14);
+  --glass: rgba(255, 255, 255, 0.045);
+  --gold: #f3e6c4;
+  --soft: rgba(246, 243, 236, 0.88);
+  --faint: rgba(246, 243, 236, 0.38);
+  --chip: rgba(255, 255, 255, 0.045);
+  --chip-hot: rgba(255, 255, 255, 0.08);
+  --field: rgba(8, 9, 14, 0.72);
+  --edge: rgba(243, 230, 196, 0.5);
+  --veil: rgba(0, 0, 0, 0.38);
+  --lift: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --bubble: rgba(8, 9, 14, 0.62);
+  --wash: rgba(243, 230, 196, 0.14);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Outfit", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(900px 560px at 50% 38%, #161b2e 0%, rgba(22, 27, 46, 0) 70%),
+    #07080c;
+}
+
+#sky {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 0%, var(--veil) 100%);
+}
+
+main {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  padding: 48px 24px 64px;
+}
+
+.lock {
+  text-align: center;
+  text-shadow: var(--lift);
+}
+
+.hello {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+#who {
+  margin: 0;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: text;
+}
+
+#who:hover,
+#who:focus-visible {
+  border-bottom-color: var(--edge);
+  outline: none;
+}
+
+.clock {
+  margin: 0;
+  font-weight: 300;
+  font-size: clamp(72px, 12vw, 128px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
+#ampm {
+  margin-left: 10px;
+  font-size: 0.24em;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  vertical-align: 0.55em;
+}
+
+.date {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.floater {
+  width: min(260px, 78vw);
+  margin: 12px auto 0;
+  z-index: 4;
+  touch-action: none;
+}
+
+.floater.is-placed {
+  position: fixed;
+  margin: 0;
+}
+
+.floater.is-dragging {
+  z-index: 5;
+}
+
+.quiet-line,
+.note {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 11px 20px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--muted);
+  text-align: center;
+  cursor: grab;
+}
+
+.quiet-line {
+  font: 400 13px/1.3 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.note {
+  font: 400 15px/1.4 "Outfit", "Segoe UI", sans-serif;
+  color: var(--soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note.is-empty {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.quiet-line:hover,
+.quiet-line:focus-visible,
+.note:hover,
+.note:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+body.is-focus [data-quiet],
+body.is-focus #bookmark-panel,
+body.is-focus #bookmark-toggle,
+body.is-focus #note-toggle,
+body.is-focus #city-toggle {
+  display: none;
+}
+
+#note-wrap[hidden],
+#note-toggle[hidden],
+#weather-wrap[hidden],
+#city-toggle[hidden] {
+  display: none;
+}
+
+.card {
+  padding: 14px 14px 12px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--chip);
+  text-align: left;
+}
+
+.card-bar,
+.weather-hide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title,
+.word-hide {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.word-hide:hover,
+.word-hide:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.pill-hide {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font: 400 14px/1 "Outfit", "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.card-bar {
+  margin-bottom: 8px;
+  cursor: grab;
+}
+
+#weather-wrap {
+  width: max-content;
+  max-width: min(220px, 70vw);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding-right: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+}
+
+#weather-wrap .quiet-line {
+  width: auto;
+  border: 0;
+  background: none;
+  padding: 6px 4px 6px 12px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+
+#weather-wrap .name-pop,
+#weather-wrap .name-input {
+  width: 148px;
+}
+
+#weather-hide {
+  margin: 0 4px 0 0;
+}
+
+.pill-hide:hover,
+.pill-hide:focus-visible {
+  color: var(--ink);
+  background: var(--chip-hot);
+  outline: none;
+}
+
+.points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.point {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.point label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.point input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.tick {
+  display: none;
+}
+
+.point-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: var(--soft);
+}
+
+.point.is-done .point-text {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.row-delete {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.row-delete:hover {
+  color: var(--ink);
+}
+
+.note-form input {
+  width: 100%;
+  height: 36px;
+  margin-top: 8px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font: 400 14px/1 "Outfit", "Segoe UI", sans-serif;
+  outline: none;
+}
+
+.note-form input:focus {
+  border-color: var(--edge);
+}
+
+.search {
+  width: min(540px, 92vw);
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px 0 18px;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.search:focus-within {
+  border-color: var(--edge);
+  background: var(--chip-hot);
+}
+
+.search .go {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.search .go:focus-visible {
+  outline: 1px solid var(--edge);
+  outline-offset: 2px;
+}
+
+.search svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font: 400 16px/1 "Outfit", "Segoe UI", sans-serif;
+}
+
+.search input::placeholder {
+  color: var(--faint);
+}
+
+.search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.dock-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(680px, 94vw);
+}
+
+.modes {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+#bookmark-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+#bookmark-panel[hidden] {
+  display: none;
+}
+
+.bookmark-toggle {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.bookmark-toggle:hover,
+.bookmark-toggle:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.dock {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px 22px;
+}
+
+.mark,
+.add {
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  text-decoration: none;
+  font: 400 12px/1.2 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.mark {
+  position: relative;
+}
+
+.glyph,
+.add-glyph {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.mark:hover .glyph,
+.mark:focus-visible .glyph,
+.add:hover .add-glyph,
+.add:focus-visible .add-glyph {
+  transform: translateY(-3px);
+  border-color: var(--edge);
+  background: var(--chip-hot);
+}
+
+.mark:focus-visible,
+.add:focus-visible {
+  outline: none;
+}
+
+.glyph svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.glyph img,
+.letter {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.letter {
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  color: var(--gold);
+}
+
+.remove {
+  position: absolute;
+  top: -4px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.mark:hover .remove,
+.mark:focus-within .remove {
+  opacity: 1;
+}
+
+.add-glyph {
+  border-style: dashed;
+  color: var(--gold);
+  font-size: 22px;
+  font-weight: 300;
+}
+
+.editor {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: min(460px, 100%);
+}
+
+.editor[hidden] {
+  display: none;
+}
+
+.editor input,
+.editor button,
+.name-input {
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--field);
+  color: var(--ink);
+  font: 400 14px/1 "Outfit", "Segoe UI", sans-serif;
+}
+
+.editor input,
+.name-input {
+  padding: 0 12px;
+  outline: none;
+}
+
+.editor input:first-child {
+  width: 120px;
+}
+
+.editor input:nth-child(2) {
+  flex: 1;
+  min-width: 160px;
+}
+
+.editor button {
+  padding: 0 14px;
+  background: var(--wash);
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.editor button:hover,
+.name-input:focus,
+.editor input:focus {
+  border-color: var(--edge);
+}
+
+.name-pop {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.name-input {
+  width: 180px;
+  text-align: center;
+}
+
+.floater .name-pop {
+  width: 100%;
+  margin-top: 0;
+}
+
+.floater .name-input {
+  width: 100%;
+}
+
+.wall-next {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 6;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.wall-next svg {
+  width: 26px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wall-next svg .head {
+  fill: currentColor;
+  stroke: none;
+}
+
+.wall-next:hover,
+.wall-next:focus-visible {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--bubble);
+  backdrop-filter: blur(12px);
+  outline: none;
+}
+
+body.is-light {
+  --ink: #221e18;
+  --muted: rgba(34, 30, 24, 0.52);
+  --line: rgba(34, 30, 24, 0.16);
+  --glass: rgba(255, 255, 255, 0.66);
+  --gold: #6e5636;
+  --soft: rgba(34, 30, 24, 0.88);
+  --faint: rgba(34, 30, 24, 0.4);
+  --chip: rgba(255, 255, 255, 0.55);
+  --chip-hot: rgba(255, 255, 255, 0.82);
+  --field: rgba(255, 252, 247, 0.92);
+  --edge: rgba(110, 86, 54, 0.45);
+  --veil: rgba(255, 250, 242, 0.35);
+  --lift: none;
+  --bubble: rgba(255, 252, 247, 0.82);
+  --wash: rgba(110, 86, 54, 0.1);
+  color-scheme: light;
+}
+
+body.is-light .search {
+  box-shadow: 0 16px 36px rgba(40, 32, 18, 0.08);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  main {
+    gap: 26px;
+    padding: 32px 20px 48px;
+  }
+
+  .hello {
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph,
+  .add-glyph {
+    transition: none;
+  }
+}

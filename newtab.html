@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>New Tab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+
+  <main>
+    <header class="lock">
+      <p class="hello" data-quiet>
+        <span id="greet">Good evening</span>,
+        <button type="button" id="who" title="Click to change your name">Adarsh</button>
+      </p>
+      <h1 class="clock" id="clock">
+        <span id="hm">4:05</span><span id="ampm">PM</span>
+      </h1>
+      <p class="date" id="date" data-quiet>Monday, 26 October</p>
+      <div class="floater" id="weather-wrap" data-quiet hidden>
+        <button type="button" id="weather" class="quiet-line" title="Drag anywhere, or click to change city"></button>
+        <button type="button" id="weather-hide" class="pill-hide" aria-label="Hide city">×</button>
+      </div>
+      <div class="floater card" id="note-wrap" data-quiet hidden>
+        <div class="card-bar">
+          <span class="card-title">Notes</span>
+          <button type="button" id="note-hide" class="word-hide">Hide</button>
+        </div>
+        <ul class="points" id="note-list"></ul>
+        <form class="note-form" id="note-form">
+          <input id="note-input" type="text" placeholder="Add a point" maxlength="140" autocomplete="off" />
+        </form>
+      </div>
+    </header>
+
+    <form class="search" id="search" role="search">
+      <label class="sr" for="q">Search</label>
+      <button class="go" type="submit" aria-label="Search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.25" />
+          <path d="M16 16.5L20 20.5" />
+        </svg>
+      </button>
+      <input id="q" name="q" type="search" placeholder="Search" autocomplete="off" spellcheck="false" />
+    </form>
+
+    <section class="dock-wrap" id="dock-wrap">
+      <div class="modes">
+        <button type="button" id="focus-toggle" class="bookmark-toggle" aria-pressed="false">Focus</button>
+        <button type="button" id="city-toggle" class="bookmark-toggle">City</button>
+        <button type="button" id="note-toggle" class="bookmark-toggle">Note</button>
+        <button type="button" id="bookmark-toggle" class="bookmark-toggle" aria-expanded="true">Hide</button>
+      </div>
+      <div id="bookmark-panel">
+        <nav class="dock" id="dock" aria-label="Bookmarks"></nav>
+        <form class="editor" id="editor" hidden>
+          <input id="bm-name" type="text" placeholder="Name" maxlength="24" autocomplete="off" />
+          <input id="bm-url" type="text" placeholder="mail.google.com" autocomplete="off" spellcheck="false" />
+          <button type="submit">Add</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <button type="button" id="wall-next" class="wall-next" aria-label="Next wallpaper">
+    <svg viewBox="0 0 40 34" aria-hidden="true">
+      <path d="M4 22C16 22 18 7 30 7" />
+      <path class="head" d="M26 3.2 36 7 26 10.8z" />
+      <path d="M4 12C16 12 18 27 30 27" />
+      <path class="head" d="M26 23.2 36 27 26 30.8z" />
+    </svg>
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>
