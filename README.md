@@ -1,6 +1,6 @@
 # New Tab
 
-A minimal Chrome new-tab page: a clock, Google search, bookmarks, notes, weather, and 67 wallpapers. Each wallpaper is a different color. The shuffle button picks one at random and will not repeat the wallpaper already on screen.
+A minimal Chrome new-tab page: a clock, Google search, bookmarks, notes, weather, and 75 wallpapers. Each wallpaper is a different color. The shuffle button picks one at random and will not repeat the wallpaper already on screen.
 
 This is for local use. Clone the repo on any computer, load the folder in Chrome, and open a new tab.
 
@@ -21,6 +21,10 @@ Soft violet
 Grey
 
 ![Grey wallpaper, light in the center and darker at the edges](screenshots/grey.png)
+
+Pale
+
+![Pale wallpaper, with notes dragged to the corner](screenshots/pale.png)
 
 ## Install on another computer
 
@@ -46,12 +50,12 @@ When the files change, open `chrome://extensions` and click the reload icon on *
 - **Shuffle** sits at the bottom right. Click it for a random wallpaper. The circle shows only while the pointer is over it. One click never repeats the current color.
 - **Search** uses Google. A web address such as `mail.google.com` opens that site.
 - **Mail** is the first bookmark. **Add** creates another. **Hide** puts every bookmark away, including Add. **Bookmarks** brings them back.
-- **City** is one line of weather. Type a city, then drag the chip. × hides it and keeps the city.
-- **Note** is a list. Tick a point when it is done. **Hide** closes the card and keeps the list. × on a point deletes only that point.
+- **City** is one line: the name, the temperature, and a small sun, cloud, or rain mark in the same color as the text. × hides the chip and keeps the city.
+- **Note** is a short list. Click the words to edit them. Tick a point when it is done. **Hide** closes the card and keeps what you wrote. × on a point deletes only that point.
 - **Focus** leaves the clock, search, and shuffle, and hides the rest. **Exit** brings them back.
-- Drag the city chip and the notes card. Near an edge, they snap into the corner.
+- Drag the city chip or the notes card to any corner. Near an edge, they snap and stay there.
 
-There are 67 wallpapers: navy, cream, black, mint, rust, peach, teal, cyan, forest, green, orange, terracotta, moon, slate, grey, coffee, ivory, ice, sky, aurora, meadow, amber, gold, plum, lilac, steel, stone, rose, pink, lake, moss, lime, wine, silver, pearl, olive, yellow, indigo, violet, and 15 different greys, including Graphite, Storm, Concrete, and Soot.
+There are 75 wallpapers. Each one is a soft color, with no hard line across the page. The set includes navy, cream, peach, meadow, petal, apricot, canopy, sea glass, honey, orchid, glacier, coral, violet, and 15 greys.
 
 ## Files
 

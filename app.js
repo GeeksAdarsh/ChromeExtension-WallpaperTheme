@@ -94,8 +94,8 @@ const walls = [
   { name: "Stone", hue: "stone", light: true, bg: "#d9d4cc", rgb: "58, 54, 48", far: 4, spark: false },
   { name: "Dawn", hue: "rose", bg: "radial-gradient(900px 380px at 50% 100%, #a84868 0%, #140810 72%)", rgb: "255, 220, 226", far: 2, spark: false },
   { name: "Blush", hue: "pink", light: true, bg: "radial-gradient(900px 380px at 50% 100%, #f0a0b4 0%, #fff5f7 72%)", rgb: "130, 42, 64", far: 2, spark: false },
-  { name: "Lake", hue: "lake", bg: "linear-gradient(#16304a 0 58%, #0c3a44 58% 100%)", rgb: "214, 236, 244", far: 3, spark: false, line: "rgba(186, 230, 236, 0.55)" },
-  { name: "Still", hue: "water", light: true, bg: "linear-gradient(#d7eef8 0 58%, #b7dce4 58% 100%)", rgb: "24, 72, 88", far: 3, spark: false, line: "rgba(40, 110, 124, 0.4)" },
+  { name: "Lake", hue: "lake", bg: "radial-gradient(900px 560px at 50% 36%, #1d4e66 0%, #07141c 74%)", rgb: "214, 236, 244", far: 3, spark: false },
+  { name: "Still", hue: "water", light: true, bg: "radial-gradient(900px 520px at 50% 28%, #d7f0f6 0%, #eef8fb 70%)", rgb: "24, 72, 88", far: 3, spark: false },
   { name: "Cedar", hue: "moss", bg: "#243018", rgb: "226, 236, 186", far: 3, spark: false },
   { name: "Fern", hue: "lime", light: true, bg: "#e4f0b8", rgb: "62, 84, 20", far: 3, spark: false },
   { name: "Wine", hue: "wine", bg: "radial-gradient(760px 460px at 50% 70%, #8a2034 0%, #14060a 72%)", rgb: "255, 214, 214", far: 2, spark: true },
@@ -122,15 +122,23 @@ const walls = [
   { name: "Lead", hue: "lead", bg: "#2c2e32", rgb: "220, 220, 222", far: 3, spark: false },
   { name: "Iron", hue: "iron", bg: "radial-gradient(800px 520px at 50% 40%, #6a7078 0%, #1c1f24 74%)", rgb: "230, 232, 234", far: 2, spark: true },
   { name: "Pewter", hue: "pewter", bg: "#3c4a58", rgb: "220, 230, 236", far: 2, spark: false },
-  { name: "Storm", hue: "storm", bg: "linear-gradient(#aeb6be 0%, #2a3036 100%)", rgb: "244, 246, 248", far: 2, spark: true },
+  { name: "Storm", hue: "storm", light: true, bg: "radial-gradient(980px 420px at 50% 0%, #d7dbe0 0%, #f4f5f6 72%)", rgb: "48, 52, 58", far: 2, spark: true },
   { name: "Concrete", hue: "concrete", light: true, bg: "#9a9ca0", rgb: "28, 28, 32", far: 3, spark: false },
   { name: "Nickel", hue: "nickel", light: true, bg: "radial-gradient(900px 560px at 50% 36%, #e4e7eb 0%, #8e949c 78%)", rgb: "32, 36, 42", far: 2, spark: true },
   { name: "Dove", hue: "dove", light: true, bg: "#ddd8d2", rgb: "58, 52, 46", far: 3, spark: false },
   { name: "Overcast", hue: "overcast", light: true, bg: "radial-gradient(900px 560px at 50% 18%, #f7f8f9 0%, #b7bec6 70%)", rgb: "42, 48, 56", far: 1, spark: true },
   { name: "Granite", hue: "granite", bg: "#6a6660", rgb: "244, 240, 232", far: 2, spark: false },
-  { name: "Zinc", hue: "zinc", light: true, bg: "linear-gradient(#d4d4d8 0 70%, #6a6a70 70% 100%)", rgb: "28, 28, 32", far: 3, spark: false, line: "rgba(40, 40, 44, 0.28)" },
+  { name: "Zinc", hue: "zinc", light: true, bg: "radial-gradient(820px 520px at 50% 40%, #f1f1f2 0%, #c5c6ca 62%, #9a9ba0 100%)", rgb: "36, 36, 40", far: 3, spark: false },
   { name: "Soot", hue: "soot", bg: "#3a342f", rgb: "236, 228, 218", far: 3, spark: false },
   { name: "Ash grey", hue: "ashgrey", light: true, bg: "radial-gradient(640px 420px at 50% 50%, #f2f2f2 0%, #8a8a8e 100%)", rgb: "30, 30, 32", far: 2, spark: true },
+  { name: "Petal", hue: "petal", light: true, bg: "radial-gradient(560px 380px at 50% 46%, #fff8f6 0%, #f6cfd6 58%, #f0b7c2 100%)", rgb: "120, 48, 64", far: 2, spark: true },
+  { name: "Apricot", hue: "apricot", light: true, bg: "radial-gradient(620px 400px at 50% 42%, #fff6ee 0%, #f6d2b4 60%, #f0b98e 100%)", rgb: "120, 62, 28", far: 2, spark: true },
+  { name: "Canopy", hue: "canopy", light: true, bg: "radial-gradient(980px 300px at 50% 0%, #b7e6c6 0%, rgba(183, 230, 198, 0) 68%), #f7fbf7", rgb: "32, 88, 52", far: 2, spark: false },
+  { name: "Sea glass", hue: "seaglass", light: true, bg: "radial-gradient(980px 300px at 50% 0%, #b7e4dc 0%, rgba(183, 228, 220, 0) 70%), #f4fbf9", rgb: "24, 88, 80", far: 2, spark: false },
+  { name: "Honey", hue: "honey", light: true, bg: "radial-gradient(640px 420px at 50% 40%, #fff8e8 0%, #f3dd9a 62%, #e8c56a 100%)", rgb: "110, 78, 16", far: 2, spark: true },
+  { name: "Orchid", hue: "orchid", light: true, bg: "radial-gradient(620px 400px at 50% 44%, #fbf7fd 0%, #e4d0f2 60%, #d2b4e8 100%)", rgb: "88, 42, 110", far: 2, spark: true },
+  { name: "Glacier", hue: "glacier", light: true, bg: "radial-gradient(980px 300px at 50% 0%, #c5dff6 0%, rgba(197, 223, 246, 0) 70%), #f5f9fd", rgb: "28, 70, 110", far: 2, spark: false },
+  { name: "Coral", hue: "coral", light: true, bg: "radial-gradient(600px 400px at 50% 48%, #fff5f2 0%, #f7c2b4 58%, #f0a090 100%)", rgb: "130, 52, 40", far: 2, spark: true },
 ];
 
 let wallIndex = Number(stored(WALL_KEY)) || 0;
@@ -706,6 +714,8 @@ noteInput.addEventListener("keydown", (event) => {
 renderNotes();
 
 const weatherBtn = document.getElementById("weather");
+const weatherLabel = document.getElementById("weather-label");
+const weatherMark = document.getElementById("weather-mark");
 const weatherWrap = document.getElementById("weather-wrap");
 const cityToggle = document.getElementById("city-toggle");
 let city = null;
@@ -721,10 +731,34 @@ function syncCity() {
   cityToggle.hidden = open;
 }
 
+function skyKind(code) {
+  const n = Number(code);
+  if (!Number.isFinite(n)) return "";
+  if (n <= 1) return "sun";
+  if (n <= 3 || n === 45 || n === 48) return "cloud";
+  return "rain";
+}
+
+function showWeather(text, kind) {
+  weatherLabel.textContent = text || "";
+  const marks = {
+    sun: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1"></circle><path d="M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M18.2 5.8l-1.6 1.6M7.4 16.6 5.8 18.2"></path></svg>`,
+    cloud: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 17.2h8.4a3.3 3.3 0 0 0 .3-6.6 4.3 4.3 0 0 0-8.2 1.3 2.7 2.7 0 0 0-.5 5.3z"></path></svg>`,
+    rain: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.4 14.6h7.6a3 3 0 0 0 .3-6 3.9 3.9 0 0 0-7.5 1.2 2.5 2.5 0 0 0-.4 4.8z"></path><path d="M9 17.4v1.7M12 17.4v1.7M15 17.4v1.7"></path></svg>`,
+  };
+  if (!marks[kind]) {
+    weatherMark.hidden = true;
+    weatherMark.innerHTML = "";
+    return;
+  }
+  weatherMark.hidden = false;
+  weatherMark.innerHTML = marks[kind];
+}
+
 async function loadWeather() {
   syncCity();
   if (!city?.name) {
-    weatherBtn.textContent = "";
+    showWeather("");
     return;
   }
 
@@ -734,23 +768,24 @@ async function loadWeather() {
   } catch (error) {
     cache = null;
   }
-  if (cache && cache.name === city.name && Date.now() - cache.at < 30 * 60 * 1000) {
-    weatherBtn.textContent = cache.label;
+  if (cache && cache.name === city.name && cache.kind && Date.now() - cache.at < 30 * 60 * 1000) {
+    showWeather(cache.label, cache.kind);
     return;
   }
 
-  weatherBtn.textContent = city.name;
+  showWeather(city.name);
   try {
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
     );
     const data = await response.json();
     const temp = Math.round(data.current.temperature_2m);
+    const kind = skyKind(data.current.weather_code);
     const label = `${city.name} · ${temp}°`;
-    weatherBtn.textContent = label;
-    keep(WEATHER_KEY, JSON.stringify({ name: city.name, label, at: Date.now() }));
+    showWeather(label, kind);
+    keep(WEATHER_KEY, JSON.stringify({ name: city.name, label, kind, at: Date.now() }));
   } catch (error) {
-    weatherBtn.textContent = city.name;
+    showWeather(city.name);
   }
 }
 
@@ -806,7 +841,7 @@ function openCityEditor() {
       syncCity();
       return;
     }
-    weatherBtn.textContent = typed;
+    showWeather(typed);
     try {
       const response = await fetch(
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(typed)}&count=1&language=en`,
@@ -814,7 +849,7 @@ function openCityEditor() {
       const data = await response.json();
       const place = data.results?.[0];
       if (!place) {
-        weatherBtn.textContent = "City not found";
+        showWeather("City not found");
         weatherWrap.hidden = false;
         cityToggle.hidden = true;
         return;
@@ -825,7 +860,7 @@ function openCityEditor() {
       drop(WEATHER_KEY);
       loadWeather();
     } catch (error) {
-      weatherBtn.textContent = "Weather unavailable";
+      showWeather("Weather unavailable");
     }
   };
 
