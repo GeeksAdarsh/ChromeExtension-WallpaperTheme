@@ -327,11 +327,53 @@ window.addEventListener("pointermove", (event) => {
 
 const wallButton = document.getElementById("wall-next");
 
+function clockDot(bg, onLight) {
+  const found = [];
+  for (const match of bg.matchAll(/#([0-9a-f]{3,8})\b/gi)) {
+    let hex = match[1];
+    if (hex.length === 3) hex = hex.split("").map((part) => part + part).join("");
+    hex = hex.slice(0, 6);
+    found.push([parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)]);
+  }
+  for (const match of bg.matchAll(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/gi)) {
+    found.push([Number(match[1]), Number(match[2]), Number(match[3])]);
+  }
+  const colors = found.filter((color) => color.every((part) => Number.isFinite(part)));
+  if (!colors.length) return onLight ? "rgb(70, 74, 78)" : "rgb(186, 190, 194)";
+
+  const ranked = colors.map(([r, g, b]) => {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    return { r, g, b, sat: max === 0 ? 0 : (max - min) / max, lum: (r + g + b) / 3 };
+  }).sort((a, b) => b.sat - a.sat || Math.abs(128 - a.lum) - Math.abs(128 - b.lum));
+  const pick = ranked[0];
+  const max = Math.max(pick.r, pick.g, pick.b);
+  const min = Math.min(pick.r, pick.g, pick.b);
+  const delta = max - min;
+  let hue = 0;
+  if (delta) {
+    if (max === pick.r) hue = ((pick.g - pick.b) / delta) % 6;
+    else if (max === pick.g) hue = (pick.b - pick.r) / delta + 2;
+    else hue = (pick.r - pick.g) / delta + 4;
+    hue *= 60;
+    if (hue < 0) hue += 360;
+  }
+  const sat = pick.sat < 0.12 ? 0.08 : Math.min(0.72, Math.max(0.46, pick.sat));
+  const level = pick.sat < 0.12 ? (onLight ? 0.38 : 0.72) : (onLight ? 0.4 : 0.62);
+  const tone = (channel) => {
+    const k = (channel + hue / 30) % 12;
+    const amount = sat * Math.min(level, 1 - level);
+    return Math.round(255 * (level - amount * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
+  };
+  return `rgb(${tone(0)}, ${tone(8)}, ${tone(4)})`;
+}
+
 function applyWall(index) {
   wallIndex = (index + walls.length) % walls.length;
   wall = walls[wallIndex];
   document.body.style.background = wall.bg;
   document.body.classList.toggle("is-light", Boolean(wall.light));
+  document.body.style.setProperty("--clock-dot", clockDot(wall.bg, Boolean(wall.light)));
   wallButton.title = `${wall.name}. Click for a different wallpaper.`;
   wallButton.setAttribute("aria-label", `Another wallpaper, now ${wall.name}`);
   keep(WALL_KEY, String(wallIndex));
@@ -357,7 +399,8 @@ drawSky(0);
 if (!reduced) requestAnimationFrame(frame);
 
 const greet = document.getElementById("greet");
-const hm = document.getElementById("hm");
+const hourEl = document.getElementById("hour");
+const minuteEl = document.getElementById("minute");
 const ampm = document.getElementById("ampm");
 const dateEl = document.getElementById("date");
 const who = document.getElementById("who");
@@ -372,9 +415,13 @@ function tick() {
     minute: "2-digit",
     hour12: true,
   }).formatToParts(now);
+  const hourText = parts.find((part) => part.type === "hour").value.padStart(2, "0");
+  const minuteText = parts.find((part) => part.type === "minute").value;
 
-  hm.textContent = `${parts.find((part) => part.type === "hour").value}:${parts.find((part) => part.type === "minute").value}`;
+  hourEl.textContent = hourText;
+  minuteEl.textContent = minuteText;
   ampm.textContent = (parts.find((part) => part.type === "dayPeriod")?.value || "").toUpperCase();
+  document.getElementById("clock").setAttribute("aria-label", `${hourText}:${minuteText} ${ampm.textContent}`);
   dateEl.textContent = now.toLocaleDateString(undefined, {
     weekday: "long",
     day: "numeric",
