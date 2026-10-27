@@ -481,20 +481,34 @@ function readPlaces() {
   }
 }
 
+function measureWrap(wrap) {
+  const hidden = wrap.hidden;
+  if (hidden) {
+    wrap.hidden = false;
+    wrap.style.visibility = "hidden";
+  }
+  const width = wrap.offsetWidth;
+  const height = wrap.offsetHeight;
+  if (hidden) {
+    wrap.hidden = true;
+    wrap.style.visibility = "";
+  }
+  return { width: width || 280, height: height || 48 };
+}
+
 function settle(left, top, wrap) {
   const pad = 16;
   const snap = 64;
-  const width = wrap.offsetWidth || 280;
-  const height = wrap.offsetHeight || 42;
+  const { width, height } = measureWrap(wrap);
   const maxLeft = Math.max(pad, window.innerWidth - width - pad);
   const maxTop = Math.max(pad, window.innerHeight - height - pad);
   let x = Math.min(Math.max(pad, left), maxLeft);
   let y = Math.min(Math.max(pad, top), maxTop);
-  if (x < snap) x = pad;
-  if (y < snap) y = pad;
+  if (x - pad < snap) x = pad;
+  if (y - pad < snap) y = pad;
   if (maxLeft - x < snap) x = maxLeft;
   if (maxTop - y < snap) y = maxTop;
-  return { left: x, top: y };
+  return { left: Math.min(Math.max(pad, x), maxLeft), top: Math.min(Math.max(pad, y), maxTop) };
 }
 
 function placeWrap(wrap, pos) {
@@ -622,6 +636,7 @@ function syncNotes() {
   const open = notes.length > 0 && stored(NOTE_OPEN_KEY) !== "0";
   noteWrap.hidden = !open;
   noteToggle.hidden = open;
+  if (open) clampPlaces();
 }
 
 function renderNotes() {
