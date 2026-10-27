@@ -4,6 +4,7 @@
   "short_name": "New Tab",
   "version": "1.1.0",
   "description": "Minimal new tab wallpaper with dark and light star skies, a clock, Google search, notes, weather, and bookmarks.",
+  "permissions": ["storage"],
   "action": {
     "default_title": "Quiet Stars — open the guide",
     "default_icon": {

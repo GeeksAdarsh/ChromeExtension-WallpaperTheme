@@ -10,6 +10,59 @@ const FOCUS_KEY = "quiet-stars-focus";
 const PLACE_KEY = "quiet-stars-places";
 const WALL_KEY = "quiet-stars-wall";
 
+const memory = Object.create(null);
+const STORE_KEYS = [
+  NAME_KEY,
+  MARK_KEY,
+  SHOW_KEY,
+  NOTE_KEY,
+  NOTE_OPEN_KEY,
+  CITY_OPEN_KEY,
+  CITY_KEY,
+  WEATHER_KEY,
+  FOCUS_KEY,
+  PLACE_KEY,
+  WALL_KEY,
+];
+
+function stored(key) {
+  if (Object.prototype.hasOwnProperty.call(memory, key)) return memory[key];
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    return null;
+  }
+}
+
+function keep(key, value) {
+  const text = String(value);
+  memory[key] = text;
+  try {
+    localStorage.setItem(key, text);
+  } catch (error) {
+    /* the other computer may drop localStorage on a new tab */
+  }
+  try {
+    chrome.storage?.local?.set({ [key]: text });
+  } catch (error) {
+    /* preview pages have no extension storage */
+  }
+}
+
+function drop(key) {
+  delete memory[key];
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    /* ignore */
+  }
+  try {
+    chrome.storage?.local?.remove(key);
+  } catch (error) {
+    /* ignore */
+  }
+}
+
 const walls = [
   { name: "Night", hue: "navy", bg: "radial-gradient(900px 560px at 50% 38%, #24345c 0%, #070b16 72%)", rgb: "246, 243, 236", far: 1, spark: true },
   { name: "Day", hue: "cream", light: true, bg: "radial-gradient(900px 560px at 50% 38%, #fff6e4 0%, #f0e2c8 70%)", rgb: "110, 78, 40", far: 2, spark: true },
@@ -80,7 +133,7 @@ const walls = [
   { name: "Ash grey", hue: "ashgrey", light: true, bg: "radial-gradient(640px 420px at 50% 50%, #f2f2f2 0%, #8a8a8e 100%)", rgb: "30, 30, 32", far: 2, spark: true },
 ];
 
-let wallIndex = Number(localStorage.getItem(WALL_KEY)) || 0;
+let wallIndex = Number(stored(WALL_KEY)) || 0;
 if (wallIndex < 0 || wallIndex >= walls.length) wallIndex = 0;
 let wall = walls[wallIndex];
 
@@ -248,7 +301,7 @@ function applyWall(index) {
   document.body.classList.toggle("is-light", Boolean(wall.light));
   wallButton.title = `${wall.name}. Click for a different wallpaper.`;
   wallButton.setAttribute("aria-label", `Another wallpaper, now ${wall.name}`);
-  localStorage.setItem(WALL_KEY, String(wallIndex));
+  keep(WALL_KEY, String(wallIndex));
 }
 
 function randomWall() {
@@ -299,7 +352,7 @@ function tick() {
 tick();
 setInterval(tick, 1000);
 
-who.textContent = localStorage.getItem(NAME_KEY) || "Adarsh";
+who.textContent = stored(NAME_KEY) || "Adarsh";
 
 who.addEventListener("click", () => {
   const input = document.createElement("input");
@@ -318,7 +371,7 @@ who.addEventListener("click", () => {
     if (save) {
       const next = input.value.trim() || "Adarsh";
       who.textContent = next;
-      localStorage.setItem(NAME_KEY, next);
+      keep(NAME_KEY, next);
     }
     pop.remove();
     who.hidden = false;
@@ -363,10 +416,10 @@ function setBookmarksVisible(visible) {
   bookmarkToggle.textContent = visible ? "Hide" : "Bookmarks";
   bookmarkToggle.setAttribute("aria-expanded", String(visible));
   if (!visible) editor.hidden = true;
-  localStorage.setItem(SHOW_KEY, visible ? "1" : "0");
+  keep(SHOW_KEY, visible ? "1" : "0");
 }
 
-setBookmarksVisible(localStorage.getItem(SHOW_KEY) !== "0");
+setBookmarksVisible(stored(SHOW_KEY) !== "0");
 
 bookmarkToggle.addEventListener("click", () => {
   setBookmarksVisible(bookmarkPanel.hidden);
@@ -378,10 +431,10 @@ function setFocus(on) {
   document.body.classList.toggle("is-focus", on);
   focusToggle.textContent = on ? "Exit" : "Focus";
   focusToggle.setAttribute("aria-pressed", String(on));
-  localStorage.setItem(FOCUS_KEY, on ? "1" : "0");
+  keep(FOCUS_KEY, on ? "1" : "0");
 }
 
-setFocus(localStorage.getItem(FOCUS_KEY) === "1");
+setFocus(stored(FOCUS_KEY) === "1");
 focusToggle.addEventListener("click", () => {
   setFocus(!document.body.classList.contains("is-focus"));
   if (!document.body.classList.contains("is-focus")) clampPlaces();
@@ -389,7 +442,7 @@ focusToggle.addEventListener("click", () => {
 
 function readPlaces() {
   try {
-    return JSON.parse(localStorage.getItem(PLACE_KEY) || "{}");
+    return JSON.parse(stored(PLACE_KEY) || "{}");
   } catch (error) {
     return {};
   }
@@ -435,7 +488,7 @@ function bindDrag(wrap) {
   let moved = false;
 
   const begin = (event, id) => {
-    if (active || event.button !== 0 || event.target.closest("input, label, .pill-hide, .word-hide, .row-delete")) return;
+    if (active || event.button !== 0 || event.target.closest("input, label, .pill-hide, .word-hide, .row-delete, .point-text, .point-edit")) return;
     const rect = wrap.getBoundingClientRect();
     active = true;
     pointerId = id;
@@ -463,7 +516,7 @@ function bindDrag(wrap) {
       placeWrap(wrap, pos);
       const saved = readPlaces();
       saved[wrap.id] = pos;
-      localStorage.setItem(PLACE_KEY, JSON.stringify(saved));
+      keep(PLACE_KEY, JSON.stringify(saved));
       wrap.dataset.dragged = "1";
     }
     active = false;
@@ -515,7 +568,7 @@ const noteForm = document.getElementById("note-form");
 const noteInput = document.getElementById("note-input");
 
 function loadNotes() {
-  const raw = localStorage.getItem(NOTE_KEY);
+  const raw = stored(NOTE_KEY);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
@@ -529,11 +582,11 @@ function loadNotes() {
 let notes = loadNotes();
 
 function saveNotes() {
-  localStorage.setItem(NOTE_KEY, JSON.stringify(notes));
+  keep(NOTE_KEY, JSON.stringify(notes));
 }
 
 function syncNotes() {
-  const open = notes.length > 0 && localStorage.getItem(NOTE_OPEN_KEY) !== "0";
+  const open = notes.length > 0 && stored(NOTE_OPEN_KEY) !== "0";
   noteWrap.hidden = !open;
   noteToggle.hidden = open;
 }
@@ -545,20 +598,24 @@ function renderNotes() {
     row.className = item.done ? "point is-done" : "point";
 
     const label = document.createElement("label");
+    label.className = "point-check";
     const box = document.createElement("input");
     box.type = "checkbox";
     box.checked = item.done;
+    box.setAttribute("aria-label", item.done ? `Done: ${item.text}` : item.text);
     box.addEventListener("change", () => {
       item.done = box.checked;
       saveNotes();
       renderNotes();
     });
-    const tick = document.createElement("span");
-    tick.className = "tick";
-    const text = document.createElement("span");
+    label.append(box);
+
+    const text = document.createElement("button");
+    text.type = "button";
     text.className = "point-text";
     text.textContent = item.text;
-    label.append(box, tick, text);
+    text.title = "Click to edit";
+    text.addEventListener("click", () => beginEdit(item, text));
 
     const remove = document.createElement("button");
     remove.type = "button";
@@ -572,14 +629,47 @@ function renderNotes() {
       syncNotes();
     });
 
-    row.append(label, remove);
+    row.append(label, text, remove);
     noteList.appendChild(row);
   }
   syncNotes();
 }
 
+function beginEdit(item, textButton) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "point-edit";
+  input.value = item.text;
+  input.maxLength = 280;
+  textButton.replaceWith(input);
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+  let closed = false;
+  const finish = (save) => {
+    if (closed) return;
+    closed = true;
+    if (save) {
+      const next = input.value.trim();
+      if (next) item.text = next;
+    }
+    saveNotes();
+    renderNotes();
+  };
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finish(true);
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finish(false);
+    }
+  });
+  input.addEventListener("blur", () => finish(true));
+}
+
 function showNotes() {
-  localStorage.setItem(NOTE_OPEN_KEY, "1");
+  keep(NOTE_OPEN_KEY, "1");
   noteWrap.hidden = false;
   noteToggle.hidden = true;
   noteInput.focus();
@@ -587,7 +677,7 @@ function showNotes() {
 
 noteToggle.addEventListener("click", showNotes);
 document.getElementById("note-hide").addEventListener("click", () => {
-  localStorage.setItem(NOTE_OPEN_KEY, "0");
+  keep(NOTE_OPEN_KEY, "0");
   syncNotes();
 });
 
@@ -597,7 +687,7 @@ function addPoint() {
   notes.push({ id: crypto.randomUUID(), text, done: false });
   noteInput.value = "";
   saveNotes();
-  localStorage.setItem(NOTE_OPEN_KEY, "1");
+  keep(NOTE_OPEN_KEY, "1");
   renderNotes();
   noteInput.focus();
 }
@@ -620,13 +710,13 @@ const weatherWrap = document.getElementById("weather-wrap");
 const cityToggle = document.getElementById("city-toggle");
 let city = null;
 try {
-  city = JSON.parse(localStorage.getItem(CITY_KEY) || "null");
+  city = JSON.parse(stored(CITY_KEY) || "null");
 } catch (error) {
   city = null;
 }
 
 function syncCity() {
-  const open = Boolean(city?.name) && localStorage.getItem(CITY_OPEN_KEY) !== "0";
+  const open = Boolean(city?.name) && stored(CITY_OPEN_KEY) !== "0";
   weatherWrap.hidden = !open;
   cityToggle.hidden = open;
 }
@@ -640,7 +730,7 @@ async function loadWeather() {
 
   let cache = null;
   try {
-    cache = JSON.parse(localStorage.getItem(WEATHER_KEY) || "null");
+    cache = JSON.parse(stored(WEATHER_KEY) || "null");
   } catch (error) {
     cache = null;
   }
@@ -658,7 +748,7 @@ async function loadWeather() {
     const temp = Math.round(data.current.temperature_2m);
     const label = `${city.name} · ${temp}°`;
     weatherBtn.textContent = label;
-    localStorage.setItem(WEATHER_KEY, JSON.stringify({ name: city.name, label, at: Date.now() }));
+    keep(WEATHER_KEY, JSON.stringify({ name: city.name, label, at: Date.now() }));
   } catch (error) {
     weatherBtn.textContent = city.name;
   }
@@ -667,7 +757,7 @@ async function loadWeather() {
 loadWeather();
 
 function showCity() {
-  localStorage.setItem(CITY_OPEN_KEY, "1");
+  keep(CITY_OPEN_KEY, "1");
   weatherWrap.hidden = false;
   cityToggle.hidden = true;
   if (!city?.name) openCityEditor();
@@ -675,7 +765,7 @@ function showCity() {
 
 cityToggle.addEventListener("click", showCity);
 document.getElementById("weather-hide").addEventListener("click", () => {
-  localStorage.setItem(CITY_OPEN_KEY, "0");
+  keep(CITY_OPEN_KEY, "0");
   syncCity();
 });
 
@@ -710,8 +800,8 @@ function openCityEditor() {
     }
     if (!typed) {
       city = null;
-      localStorage.removeItem(CITY_KEY);
-      localStorage.removeItem(WEATHER_KEY);
+      drop(CITY_KEY);
+      drop(WEATHER_KEY);
       loadWeather();
       syncCity();
       return;
@@ -730,9 +820,9 @@ function openCityEditor() {
         return;
       }
       city = { name: place.name, latitude: place.latitude, longitude: place.longitude };
-      localStorage.setItem(CITY_KEY, JSON.stringify(city));
-      localStorage.setItem(CITY_OPEN_KEY, "1");
-      localStorage.removeItem(WEATHER_KEY);
+      keep(CITY_KEY, JSON.stringify(city));
+      keep(CITY_OPEN_KEY, "1");
+      drop(WEATHER_KEY);
       loadWeather();
     } catch (error) {
       weatherBtn.textContent = "Weather unavailable";
@@ -753,7 +843,7 @@ weatherBtn.addEventListener("click", openCityEditor);
 
 function loadMarks() {
   try {
-    const saved = JSON.parse(localStorage.getItem(MARK_KEY) || "null");
+    const saved = JSON.parse(stored(MARK_KEY) || "null");
     if (Array.isArray(saved)) return saved;
   } catch (error) {
     /* keep the default mail bookmark */
@@ -764,7 +854,7 @@ function loadMarks() {
 let marks = loadMarks();
 
 function saveMarks() {
-  localStorage.setItem(MARK_KEY, JSON.stringify(marks));
+  keep(MARK_KEY, JSON.stringify(marks));
 }
 
 function safeUrl(value) {
@@ -859,4 +949,68 @@ editor.addEventListener("submit", (event) => {
   editor.reset();
   editor.hidden = true;
   renderDock();
+});
+
+function placeSaved() {
+  document.querySelectorAll(".floater.is-placed").forEach((wrap) => {
+    wrap.classList.remove("is-placed");
+    wrap.style.left = "";
+    wrap.style.top = "";
+  });
+  for (const [id, pos] of Object.entries(readPlaces())) {
+    const wrap = document.getElementById(id);
+    if (wrap && Number.isFinite(pos?.left) && Number.isFinite(pos?.top)) placeWrap(wrap, pos);
+  }
+  clampPlaces();
+}
+
+function restoreSaved() {
+  const nextWall = Number(stored(WALL_KEY)) || 0;
+  if (nextWall !== wallIndex) applyWall(nextWall);
+  who.textContent = stored(NAME_KEY) || "Adarsh";
+  setBookmarksVisible(stored(SHOW_KEY) !== "0");
+  setFocus(stored(FOCUS_KEY) === "1");
+  notes = loadNotes();
+  renderNotes();
+  try {
+    city = JSON.parse(stored(CITY_KEY) || "null");
+  } catch (error) {
+    city = null;
+  }
+  loadWeather();
+  marks = loadMarks();
+  renderDock();
+  placeSaved();
+}
+
+async function pullChromeStore() {
+  if (!chrome.storage?.local) return;
+  const items = await chrome.storage.local.get(STORE_KEYS);
+  const found = STORE_KEYS.some((key) => typeof items[key] === "string");
+  if (!found) {
+    const seed = {};
+    for (const key of STORE_KEYS) {
+      const value = stored(key);
+      if (value != null) seed[key] = value;
+    }
+    if (Object.keys(seed).length) chrome.storage.local.set(seed);
+    return;
+  }
+  for (const key of STORE_KEYS) {
+    if (typeof items[key] === "string") memory[key] = items[key];
+  }
+  restoreSaved();
+}
+
+pullChromeStore();
+
+chrome.storage?.onChanged?.addListener((changes, area) => {
+  if (area !== "local" || document.querySelector(".point-edit")) return;
+  if (!changes[NOTE_KEY] && !changes[NOTE_OPEN_KEY]) return;
+  for (const key of [NOTE_KEY, NOTE_OPEN_KEY]) {
+    const next = changes[key]?.newValue;
+    if (typeof next === "string" && next !== memory[key]) memory[key] = next;
+  }
+  notes = loadNotes();
+  renderNotes();
 });

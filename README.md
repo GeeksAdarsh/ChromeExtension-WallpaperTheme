@@ -37,7 +37,7 @@ git clone https://github.com/GeeksAdarsh/ChromeExtension-WallpaperTheme.git
 6. Select the cloned `ChromeExtension-WallpaperTheme` folder. The folder you select must contain `manifest.json`.
 7. Open a new tab.
 
-Your name, notes, city, and bookmarks stay in that browser only. A new computer starts empty. The default name is Adarsh. Click the name to change it.
+Your name, notes, city, and bookmarks stay in Chrome on that computer. They are not inside the Git repo, so a new computer starts empty. After you add a note there, open another new tab and it stays. The default name is Adarsh. Click the name to change it.
 
 When the files change, open `chrome://extensions` and click the reload icon on **New Tab**.
 
