@@ -1,6 +1,6 @@
 # New Tab
 
-A minimal Chrome new-tab page: a clock, Google search, bookmarks, notes, weather, and 75 wallpapers. Each wallpaper is a different color. The shuffle button picks one at random and will not repeat the wallpaper already on screen.
+A minimal Chrome new-tab page: a clock, Google search, bookmarks, notes, weather, and 100 wallpapers. Each wallpaper is a different color. The shuffle button picks one at random and will not repeat the wallpaper already on screen.
 
 This is for local use. Clone the repo on any computer, load the folder in Chrome, and open a new tab.
 
@@ -55,7 +55,7 @@ When the files change, open `chrome://extensions` and click the reload icon on *
 - **Focus** leaves the clock, search, and shuffle, and hides the rest. **Exit** brings them back.
 - Drag the city chip or the notes card to any corner. Near an edge, they snap and stay there.
 
-There are 75 wallpapers. Each one is a soft color, with no hard line across the page. The set includes navy, cream, peach, meadow, petal, apricot, canopy, sea glass, honey, orchid, glacier, coral, violet, and 15 greys.
+There are 100 wallpapers. Each one is a soft color, with no hard line across the page. The set includes navy, cream, peach, meadow, petal, apricot, canopy, sea glass, honey, orchid, glacier, coral, violet, and 15 greys.
 
 ## Files
 
