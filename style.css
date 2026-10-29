@@ -341,9 +341,43 @@ body.is-focus #city-toggle {
 }
 
 .point {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 8px;
+}
+
+.point-pin {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 1px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.point-pin:not(.is-on) {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  pointer-events: none;
+}
+
+.point:hover .point-pin:not(.is-on),
+.point:focus-within .point-pin:not(.is-on),
+.point-pin:focus-visible,
+.point-pin.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.point-pin.is-on {
+  position: static;
+  color: var(--ink);
 }
 
 .point-check {
@@ -392,6 +426,17 @@ body.is-focus #city-toggle {
 .point.is-done .point-text {
   opacity: 0.4;
   text-decoration: line-through;
+}
+
+.point-pin svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .row-delete {

@@ -545,17 +545,18 @@ function measureWrap(wrap) {
 
 function settle(left, top, wrap) {
   const pad = 16;
+  const padTop = 28;
   const snap = 64;
   const { width, height } = measureWrap(wrap);
   const maxLeft = Math.max(pad, window.innerWidth - width - pad);
-  const maxTop = Math.max(pad, window.innerHeight - height - pad);
+  const maxTop = Math.max(padTop, window.innerHeight - height - pad);
   let x = Math.min(Math.max(pad, left), maxLeft);
-  let y = Math.min(Math.max(pad, top), maxTop);
+  let y = Math.min(Math.max(padTop, top), maxTop);
   if (x - pad < snap) x = pad;
-  if (y - pad < snap) y = pad;
+  if (y - padTop < snap) y = padTop;
   if (maxLeft - x < snap) x = maxLeft;
   if (maxTop - y < snap) y = maxTop;
-  return { left: Math.min(Math.max(pad, x), maxLeft), top: Math.min(Math.max(pad, y), maxTop) };
+  return { left: Math.min(Math.max(pad, x), maxLeft), top: Math.min(Math.max(padTop, y), maxTop) };
 }
 
 function placeWrap(wrap, pos) {
@@ -582,7 +583,7 @@ function bindDrag(wrap) {
   let moved = false;
 
   const begin = (event, id) => {
-    if (active || event.button !== 0 || event.target.closest("input, label, .pill-hide, .word-hide, .row-delete, .point-text, .point-edit")) return;
+    if (active || event.button !== 0 || event.target.closest("input, label, .pill-hide, .word-hide, .row-delete, .point-pin, .point-text, .point-edit")) return;
     const rect = wrap.getBoundingClientRect();
     active = true;
     pointerId = id;
@@ -686,8 +687,13 @@ function syncNotes() {
   if (open) clampPlaces();
 }
 
+function orderNotes() {
+  notes = [...notes.filter((item) => item.pinned), ...notes.filter((item) => !item.pinned)];
+}
+
 function renderNotes() {
   noteList.innerHTML = "";
+  orderNotes();
   for (const item of notes) {
     const row = document.createElement("li");
     row.className = item.done ? "point is-done" : "point";
@@ -712,6 +718,20 @@ function renderNotes() {
     text.title = "Click to edit";
     text.addEventListener("click", () => beginEdit(item, text));
 
+    const pin = document.createElement("button");
+    pin.type = "button";
+    pin.className = item.pinned ? "point-pin is-on" : "point-pin";
+    pin.setAttribute("aria-label", item.pinned ? `Unpin ${item.text}` : `Pin ${item.text}`);
+    pin.setAttribute("aria-pressed", String(Boolean(item.pinned)));
+    pin.title = item.pinned ? "Unpin" : "Pin";
+    pin.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.5h8l-1.2 6.2 2.7 2.1v1.7H6.5v-1.7l2.7-2.1z"></path><path d="M12 14.5v5"></path></svg>`;
+    pin.addEventListener("click", () => {
+      item.pinned = !item.pinned;
+      orderNotes();
+      saveNotes();
+      renderNotes();
+    });
+
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "row-delete";
@@ -724,7 +744,7 @@ function renderNotes() {
       syncNotes();
     });
 
-    row.append(label, text, remove);
+    row.append(label, text, pin, remove);
     noteList.appendChild(row);
   }
   syncNotes();
