@@ -27,7 +27,7 @@
     <section class="hero">
       <p class="kicker">Quiet Stars</p>
       <h1>Minimal New Tab Wallpaper — Quiet Stars</h1>
-      <p class="lede">A quiet new tab. Tiny stars, a clock, and Google search. Each shuffle switches from a dark wallpaper to a light one.</p>
+      <p class="lede">A quiet new tab. A clock, Google search, notes by day, a job counter, a study timer, and 130 wallpapers, including hand-drawn colored-pencil art.</p>
     </section>
 
     <section class="block" aria-labelledby="steps-title">
@@ -39,7 +39,7 @@
         </li>
         <li>
           <h3>Change the wallpaper</h3>
-          <p>Click the shuffle mark at the bottom right. One click is a dark sky. The next is a light sky. The circle shows only while you hover.</p>
+          <p>Click the shuffle mark at the bottom right for a random wallpaper. Hover it to see Auto beside it: click Auto to get a new wallpaper on each tab, once a day, or light by day and dark at night.</p>
         </li>
         <li>
           <h3>Search</h3>
@@ -51,7 +51,11 @@
         </li>
         <li>
           <h3>City and notes</h3>
-          <p>City is one line of weather. Drag it anywhere. × hides it and keeps the city. Note is a list: tick a point when it is done, Hide closes the card and keeps the list, and × on a point deletes only that point.</p>
+          <p>City is one line of weather. Drag it anywhere. × hides it and keeps the city. Notes have a tab for each day, and a new day starts at 4 AM. + makes your own list, such as Special. Drag tabs and notes to reorder them. The bell on a note brings it back into Today later. Count applied jobs with + and −, and see the week, your streak, and your best run.</p>
+        </li>
+        <li>
+          <h3>Study</h3>
+          <p>Study turns the big clock into a countdown. Everything else still works. The minutes count toward your streak.</p>
         </li>
         <li>
           <h3>Focus</h3>
@@ -60,13 +64,37 @@
       </ol>
     </section>
 
+    <section class="block" aria-labelledby="backup-title">
+      <h2 id="backup-title">Backup</h2>
+      <p class="log-note">Save your notes, lists, job counts, study time, bookmarks, and settings to one file. Restore it on another computer, or after Chrome is reset.</p>
+      <div class="backup-tools">
+        <button type="button" id="backup-save" class="backup-btn">Download backup</button>
+        <button type="button" id="backup-load" class="backup-btn">Restore from file</button>
+        <input type="file" id="backup-file" accept="application/json,.json" hidden />
+      </div>
+      <p class="backup-status" id="backup-status" role="status"></p>
+    </section>
+
     <section class="block" aria-labelledby="log-title">
       <h2 id="log-title">Log</h2>
       <p class="log-note">The extension page and this log use the same name: Minimal New Tab Wallpaper — Quiet Stars.</p>
       <article class="release">
         <header>
-          <h3>1.1.0</h3>
+          <h3>1.2.0</h3>
           <p>Current</p>
+        </header>
+        <ul>
+          <li>Notes by day with a 4 AM rollover, your own lists, reminders, and drag to reorder.</li>
+          <li>An applied jobs counter with week total, streak, and best run.</li>
+          <li>A study timer on the big clock.</li>
+          <li>30 colored-pencil wallpapers that sway gently, and automatic wallpaper changes.</li>
+          <li>Backup and restore on this page.</li>
+        </ul>
+      </article>
+      <article class="release">
+        <header>
+          <h3>1.1.0</h3>
+          <p>Earlier</p>
         </header>
         <ul>
           <li>The name is now Minimal New Tab Wallpaper — Quiet Stars, on this page and in the log.</li>
@@ -91,7 +119,8 @@
 
   <footer class="site-foot">
     <p>Minimal New Tab Wallpaper — Quiet Stars</p>
-    <p>Version 1.1.0</p>
+    <p>Version 1.2.0</p>
   </footer>
+  <script src="guide.js"></script>
 </body>
 </html>

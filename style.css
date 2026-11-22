@@ -337,7 +337,146 @@ body.is-focus #city-toggle {
 }
 
 #note-wrap {
+  position: relative;
   width: min(340px, 88vw);
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 44px);
+}
+
+#note-wrap.floater.is-placed {
+  position: fixed;
+}
+
+#note-wrap.is-sized {
+  display: flex;
+  flex-direction: column;
+}
+
+#note-wrap.is-sized > * {
+  flex: none;
+}
+
+#note-wrap.is-sized > .points {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+#note-wrap.is-sized[hidden] {
+  display: none;
+}
+
+.card-size {
+  position: absolute;
+  z-index: 1;
+  touch-action: none;
+}
+
+.size-e {
+  top: 18px;
+  right: -4px;
+  bottom: 18px;
+  width: 10px;
+  cursor: ew-resize;
+}
+
+.size-s {
+  left: 18px;
+  right: 18px;
+  bottom: -4px;
+  height: 10px;
+  cursor: ns-resize;
+}
+
+.size-se {
+  right: 2px;
+  bottom: 2px;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  background:
+    linear-gradient(135deg, transparent 55%, var(--muted) 55%, var(--muted) 62%, transparent 62%, transparent 72%, var(--muted) 72%, var(--muted) 79%, transparent 79%);
+}
+
+#note-wrap:hover .size-se,
+#note-wrap.is-sizing .size-se {
+  opacity: 0.7;
+}
+
+#note-wrap.is-sizing {
+  user-select: none;
+}
+
+.count-week {
+  margin-left: 4px;
+  color: var(--faint);
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.stat-line {
+  margin: -4px 0 8px 2px;
+  color: var(--faint);
+  font: 400 11px/1.3 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+}
+
+.stat-line[hidden],
+.stat-line:empty {
+  display: none;
+}
+
+.study-pick {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.study-pick[hidden] {
+  display: none;
+}
+
+.study-pick button,
+.study-pick input {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--muted);
+  font: 400 12px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.study-pick input {
+  width: 64px;
+  cursor: text;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.study-pick input::-webkit-outer-spin-button,
+.study-pick input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.study-pick button:hover,
+.study-pick button:focus-visible,
+.study-pick input:focus {
+  border-color: var(--edge);
+  color: var(--ink);
+  outline: none;
+}
+
+body.is-study #ampm {
+  letter-spacing: 0.18em;
 }
 
 .point {
@@ -437,6 +576,333 @@ body.is-focus #city-toggle {
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 -2px 8px;
+}
+
+.day-strip {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+  padding: 0 2px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.day-add {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  padding: 0;
+  border: 1px dashed var(--line);
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font: 400 15px/1 "Outfit", "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.day-add[hidden] {
+  display: none;
+}
+
+.day-add:hover,
+.day-add:focus-visible {
+  border-color: var(--edge);
+  color: var(--ink);
+  outline: none;
+}
+
+.day-name {
+  width: 110px;
+  height: 24px;
+  flex: none;
+  padding: 0 10px;
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 400 12px/1 "Outfit", "Segoe UI", sans-serif;
+  outline: none;
+}
+
+.count-row[hidden],
+.copy-open[hidden] {
+  display: none;
+}
+
+.copy-open {
+  margin: 8px 0 0 2px;
+  padding: 0;
+}
+
+.copy-open:hover,
+.copy-open:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.point-copy {
+  position: absolute;
+  top: 0;
+  right: 46px;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.point:hover .point-copy,
+.point:focus-within .point-copy {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.point-copy:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.point-copy:disabled {
+  cursor: default;
+}
+
+.point-remind {
+  position: absolute;
+  top: 0;
+  right: 46px;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.point-remind.is-far {
+  right: 68px;
+}
+
+.point:hover .point-remind,
+.point:focus-within .point-remind {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.point-remind:hover {
+  color: var(--ink);
+}
+
+.point-remind svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.point-when {
+  margin-left: 6px;
+  color: var(--faint);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.remind-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 4px 26px;
+}
+
+.remind-pick button {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--muted);
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.remind-pick button:hover,
+.remind-pick button:focus-visible {
+  border-color: var(--edge);
+  color: var(--ink);
+  outline: none;
+}
+
+.point-copy svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.day-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.day-item {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+}
+
+.day-item.is-dragging,
+.point.is-dragging {
+  opacity: 0.35;
+}
+
+.day-item.is-on {
+  border-color: var(--line);
+  background: var(--chip-hot);
+}
+
+.day-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 400 12px/1.2 "Outfit", "Segoe UI", sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.day-item.is-on .day-chip,
+.day-chip:hover,
+.day-chip:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.day-count {
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.day-item.is-on .day-count {
+  color: var(--muted);
+}
+
+.day-remove {
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font: 400 13px/1 "Outfit", "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.day-remove:hover,
+.day-remove:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 4px 4px 4px 2px;
+  border-bottom: 1px solid var(--line);
+}
+
+.count-label {
+  color: var(--muted);
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.count-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.count-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font: 400 14px/1 "Outfit", "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.count-btn:hover:not(:disabled),
+.count-btn:focus-visible {
+  border-color: var(--edge);
+  color: var(--ink);
+  outline: none;
+}
+
+.count-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.count-value {
+  min-width: 2ch;
+  color: var(--ink);
+  font: 400 15px/1 "Outfit", "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.point-link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--edge);
+  text-underline-offset: 2px;
+}
+
+.point-link:hover,
+.point-link:focus-visible {
+  text-decoration-color: currentColor;
+  outline: none;
+}
+
+.point-text:focus-visible {
+  outline: none;
+  border-bottom: 1px solid var(--edge);
 }
 
 .row-delete {
@@ -775,6 +1241,32 @@ body.is-focus #city-toggle {
   background: transparent;
   color: var(--ink);
   cursor: pointer;
+}
+
+.wall-auto {
+  position: fixed;
+  right: 72px;
+  bottom: 33px;
+  z-index: 6;
+  padding: 4px 6px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 200ms ease 1200ms;
+}
+
+.wall-next:hover ~ .wall-auto,
+.wall-auto:hover,
+.wall-auto:focus-visible {
+  opacity: 1;
+  color: var(--ink);
+  outline: none;
+  transition-delay: 0ms;
 }
 
 .wall-next svg {
