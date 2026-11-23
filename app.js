@@ -17,6 +17,7 @@ const STUDY_KEY = "quiet-stars-study";
 const NOTE_SIZE_KEY = "quiet-stars-note-size";
 const AUTO_KEY = "quiet-stars-wall-auto";
 const WALL_DAY_KEY = "quiet-stars-wall-day";
+const PROFILES_KEY = "quiet-stars-profiles";
 
 const memory = Object.create(null);
 const STORE_KEYS = [
@@ -39,6 +40,7 @@ const STORE_KEYS = [
   NOTE_SIZE_KEY,
   AUTO_KEY,
   WALL_DAY_KEY,
+  PROFILES_KEY,
 ];
 
 function stored(key) {
@@ -1522,7 +1524,7 @@ function bindDrag(wrap) {
   let moved = false;
 
   const begin = (event, id) => {
-    if (active || event.button !== 0 || event.target.closest("input, label, .pill-hide, .word-hide, .row-delete, .point-pin, .point-text, .point-edit, .point-copy, .point-remind, .remind-pick, .point, .card-size, .day-row, .count-row, .copy-open")) return;
+    if (active || event.button !== 0 || event.target.closest("input, label, .pill-hide, .word-hide, .row-delete, .point-pin, .point-text, .point-edit, .point-copy, .point-remind, .remind-pick, .point, .card-size, .day-row, .count-rows, .copy-open")) return;
     const rect = wrap.getBoundingClientRect();
     active = true;
     pointerId = id;
@@ -1614,11 +1616,9 @@ function loadNotes() {
 }
 
 const dayStrip = document.getElementById("day-strip");
-const countValue = document.getElementById("count-value");
-const countUp = document.getElementById("count-up");
-const countDown = document.getElementById("count-down");
-const countRow = document.getElementById("count-row");
-const countWeek = document.getElementById("count-week");
+const countRows = document.getElementById("count-rows");
+const MAIN_PROFILE = "main";
+const MAX_PROFILES = 4;
 const statLine = document.getElementById("stat-line");
 const listAdd = document.getElementById("list-add");
 const copyOpen = document.getElementById("copy-open");
@@ -1678,10 +1678,11 @@ function loadNoteStore() {
     const old = loadNotes();
     const rest = old.filter((item) => !item.pinned);
     return {
-      days: rest.length ? { [dayKey()]: { notes: rest, count: 0, sessions: {} } } : {},
+      days: rest.length ? { [dayKey()]: { notes: rest, count: 0, counts: {}, sessions: {} } } : {},
       pinned: old.filter((item) => item.pinned),
       lists: [],
       order: [],
+      profiles: loadProfiles(),
     };
   }
   const raw = readJSON(DAYS_KEY, {});
@@ -1692,7 +1693,11 @@ function loadNoteStore() {
     for (const [start, minutes] of Object.entries(day?.sessions && typeof day.sessions === "object" ? day.sessions : {})) {
       if (Number(minutes) > 0) sessions[start] = Math.floor(Number(minutes));
     }
-    days[key] = { notes: cleanNotes(day?.notes), count: Math.max(0, Math.floor(Number(day?.count) || 0)), sessions };
+    const counts = {};
+    for (const [id, value] of Object.entries(day?.counts && typeof day.counts === "object" ? day.counts : {})) {
+      if (Number(value) > 0) counts[id] = Math.floor(Number(value));
+    }
+    days[key] = { notes: cleanNotes(day?.notes), count: Math.max(0, Math.floor(Number(day?.count) || 0)), counts, sessions };
   }
   const order = readJSON(TAB_ORDER_KEY, []);
   return {
@@ -1700,16 +1705,36 @@ function loadNoteStore() {
     pinned: cleanNotes(readJSON(PINNED_KEY, [])),
     lists: cleanLists(readJSON(LISTS_KEY, [])),
     order: Array.isArray(order) ? order.filter((view) => typeof view === "string") : [],
+    profiles: loadProfiles(),
   };
 }
 
-let { days, pinned, lists, order: tabOrder } = loadNoteStore();
+function loadProfiles() {
+  const raw = readJSON(PROFILES_KEY, []);
+  const list = (Array.isArray(raw) ? raw : [])
+    .filter((entry) => entry && typeof entry.id === "string" && typeof entry.name === "string" && entry.name)
+    .map((entry) => ({ id: entry.id, name: entry.name.slice(0, 20) }));
+  if (!list.some((entry) => entry.id === MAIN_PROFILE)) list.unshift({ id: MAIN_PROFILE, name: "Applied jobs" });
+  return list;
+}
+
+let { days, pinned, lists, order: tabOrder, profiles } = loadNoteStore();
 let today = dayKey();
 let viewDay = today;
 
 function dayOf(key) {
-  if (!days[key]) days[key] = { notes: [], count: 0, sessions: {} };
+  if (!days[key]) days[key] = { notes: [], count: 0, counts: {}, sessions: {} };
   return days[key];
+}
+
+function countOf(key, id) {
+  const day = days[key];
+  if (!day) return 0;
+  return id === MAIN_PROFILE ? day.count : day.counts[id] || 0;
+}
+
+function dayTotal(day) {
+  return (day?.count || 0) + Object.values(day?.counts || {}).reduce((sum, value) => sum + value, 0);
 }
 
 function studyMinutes(key) {
@@ -1717,7 +1742,7 @@ function studyMinutes(key) {
 }
 
 function isActive(key) {
-  return Boolean(days[key]?.count || studyMinutes(key));
+  return Boolean(dayTotal(days[key]) || studyMinutes(key));
 }
 
 function shiftKey(key, step) {
@@ -1728,9 +1753,12 @@ function shiftKey(key, step) {
 function noteStats() {
   const base = parseKey(today);
   const monday = shiftKey(today, -((base.getDay() + 6) % 7));
-  let week = 0;
-  for (const [key, day] of Object.entries(days)) {
-    if (key >= monday && key <= today) week += day.count;
+  const weeks = {};
+  for (const profile of profiles) {
+    weeks[profile.id] = 0;
+    for (const key of Object.keys(days)) {
+      if (key >= monday && key <= today) weeks[profile.id] += countOf(key, profile.id);
+    }
   }
   let streak = 0;
   for (let key = isActive(today) ? today : shiftKey(today, -1); isActive(key); key = shiftKey(key, -1)) streak += 1;
@@ -1742,7 +1770,7 @@ function noteStats() {
     best = Math.max(best, run);
     prev = key;
   }
-  return { week, streak, best };
+  return { weeks, streak, best };
 }
 
 function formatMinutes(total) {
@@ -1763,15 +1791,16 @@ function viewNotes(view, create = false) {
 
 function saveNotes() {
   for (const [key, day] of Object.entries(days)) {
-    if (!day.notes.length && !day.count && !Object.keys(day.sessions).length) delete days[key];
+    if (!day.notes.length && !dayTotal(day) && !Object.keys(day.sessions).length) delete days[key];
   }
   keep(DAYS_KEY, JSON.stringify(days));
+  keep(PROFILES_KEY, JSON.stringify(profiles));
   keep(PINNED_KEY, JSON.stringify(pinned));
   keep(LISTS_KEY, JSON.stringify(lists));
 }
 
 function hasNotes() {
-  return pinned.length > 0 || lists.length > 0 || Object.values(days).some((day) => day.notes.length || day.count || Object.keys(day.sessions).length);
+  return pinned.length > 0 || lists.length > 0 || Object.values(days).some((day) => day.notes.length || dayTotal(day) || Object.keys(day.sessions).length);
 }
 
 function inToday(text) {
@@ -1898,7 +1927,7 @@ function renderDays() {
       continue;
     }
     const key = view;
-    addTab(key, days[key]?.count || 0, key === today ? null : () => {
+    addTab(key, dayTotal(days[key]), key === today ? null : () => {
       if (!window.confirm(`Delete every note, count and study time saved for ${dayLabel(key)}?`)) return;
       delete days[key];
       viewDay = today;
@@ -1949,24 +1978,135 @@ function openListName() {
 
 listAdd.addEventListener("click", openListName);
 
+function renameProfile(profile, label) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "count-name";
+  input.value = profile.name;
+  input.maxLength = 20;
+  input.setAttribute("aria-label", "Profile name");
+  label.replaceWith(input);
+  input.focus();
+  input.select();
+  let closed = false;
+  const finish = (save) => {
+    if (closed) return;
+    closed = true;
+    const name = input.value.trim();
+    if (save && name) profile.name = name;
+    input.remove();
+    saveNotes();
+    renderNotes();
+  };
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finish(true);
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finish(false);
+    }
+  });
+  input.addEventListener("blur", () => finish(true));
+}
+
+function removeProfile(profile) {
+  const used = Object.values(days).some((day) => day.counts[profile.id]);
+  if (used && !window.confirm(`Remove ${profile.name} and every count saved for it?`)) return;
+  profiles = profiles.filter((entry) => entry.id !== profile.id);
+  for (const day of Object.values(days)) delete day.counts[profile.id];
+  saveNotes();
+  renderNotes();
+}
+
+function addProfile() {
+  if (profiles.length >= MAX_PROFILES) return;
+  const profile = { id: crypto.randomUUID(), name: `Profile ${profiles.length + 1}` };
+  profiles.push(profile);
+  saveNotes();
+  keep(NOTE_OPEN_KEY, "1");
+  renderNotes();
+  const label = countRows.querySelector(`[data-profile="${profile.id}"] .count-label`);
+  if (label) renameProfile(profile, label);
+}
+
 function renderCount() {
   const isList = Boolean(listOf(viewDay));
-  countRow.hidden = isList;
+  countRows.hidden = isList;
   statLine.hidden = isList;
-  const { week, streak, best } = noteStats();
-  countWeek.textContent = `· ${week} this week`;
+  const { weeks, streak, best } = noteStats();
   const studied = studyMinutes(viewDay);
   statLine.textContent = [
     streak ? `${streak}-day streak` : "No streak yet",
     best > 1 ? `best ${best} days` : "",
     studied ? `${formatMinutes(studied)} studied` : "",
   ].filter(Boolean).join(" · ");
-  const count = days[viewDay]?.count || 0;
-  countValue.textContent = count;
-  countDown.disabled = count === 0;
-  const label = dayLabel(viewDay);
-  countUp.setAttribute("aria-label", `Add one application for ${label}`);
-  countDown.setAttribute("aria-label", `Remove one application for ${label}`);
+  if (countRows.querySelector(".count-name")) return;
+  countRows.innerHTML = "";
+  const dayName = dayLabel(viewDay);
+  for (const profile of profiles) {
+    const row = document.createElement("div");
+    row.className = "count-row";
+    row.dataset.profile = profile.id;
+
+    const name = document.createElement("span");
+    name.className = "count-head";
+    const label = document.createElement("button");
+    label.type = "button";
+    label.className = "count-label";
+    label.textContent = profile.name;
+    label.title = "Click to rename";
+    label.addEventListener("click", () => renameProfile(profile, label));
+    const week = document.createElement("span");
+    week.className = "count-week";
+    const weekCount = weeks[profile.id] || 0;
+    week.textContent = `· ${weekCount} this wk`;
+    week.title = `${weekCount} this week`;
+    name.append(label, week);
+
+    const tools = document.createElement("span");
+    tools.className = "count-tools";
+    const count = countOf(viewDay, profile.id);
+    const down = document.createElement("button");
+    down.type = "button";
+    down.className = "count-btn";
+    down.textContent = "−";
+    down.disabled = count === 0;
+    down.setAttribute("aria-label", `Remove one ${profile.name} application for ${dayName}`);
+    down.addEventListener("click", () => changeCount(profile.id, -1));
+    const value = document.createElement("span");
+    value.className = "count-value";
+    value.textContent = count;
+    const up = document.createElement("button");
+    up.type = "button";
+    up.className = "count-btn";
+    up.textContent = "+";
+    up.setAttribute("aria-label", `Add one ${profile.name} application for ${dayName}`);
+    up.addEventListener("click", () => changeCount(profile.id, 1));
+    tools.append(down, value, up);
+
+    if (profile.id !== MAIN_PROFILE) {
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "count-remove";
+      remove.textContent = "×";
+      remove.setAttribute("aria-label", `Remove profile ${profile.name}`);
+      remove.addEventListener("click", () => removeProfile(profile));
+      tools.append(remove);
+    }
+    row.append(name, tools);
+    countRows.append(row);
+  }
+  if (profiles.length < MAX_PROFILES) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "count-add";
+    add.textContent = "+ Profile";
+    add.setAttribute("aria-label", "Add another job profile to count");
+    add.addEventListener("click", addProfile);
+    countRows.append(add);
+  }
 }
 
 function linkFor(raw) {
@@ -1980,24 +2120,55 @@ function linkFor(raw) {
   }
 }
 
-function fillText(target, text) {
+function fillText(target, text, onLabel) {
+  const links = [];
+  let words = "";
   let last = 0;
   for (const match of text.matchAll(LINK_PATTERN)) {
     const found = linkFor(match[0]);
     if (!found) continue;
-    target.append(text.slice(last, match.index));
-    const link = document.createElement("a");
-    link.className = "point-link";
-    link.href = found.url.href;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.title = found.url.href;
-    const path = found.url.pathname === "/" && !found.url.search ? "" : "/…";
-    link.textContent = `${found.url.hostname.replace(/^www\./, "")}${path}`;
-    target.append(link, found.rest);
+    words += `${text.slice(last, match.index)} ${found.rest}`;
+    links.push(found.url);
     last = match.index + match[0].length;
   }
-  target.append(text.slice(last));
+  words = (words + text.slice(last)).replace(/\s+/g, " ").trim();
+  if (!links.length) {
+    target.append(text);
+    return;
+  }
+
+  if (words) {
+    const title = document.createElement("span");
+    title.className = "point-title";
+    title.textContent = words;
+    target.append(title);
+  }
+  const row = document.createElement("span");
+  row.className = words ? "point-links is-under" : "point-links";
+  for (const url of links) {
+    const link = document.createElement("a");
+    link.className = "point-link";
+    link.href = url.href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.title = url.href;
+    const path = url.pathname === "/" && !url.search ? "" : "/…";
+    link.textContent = `${url.hostname.replace(/^www\./, "")}${path} ↗`;
+    row.append(link);
+  }
+  if (!words && onLabel) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "point-label-add";
+    add.textContent = "+ label";
+    add.title = "Add a word to remember what this link is for";
+    add.addEventListener("click", (event) => {
+      event.stopPropagation();
+      onLabel();
+    });
+    row.append(add);
+  }
+  target.append(row);
 }
 
 function removeNote(item) {
@@ -2039,9 +2210,9 @@ function renderNotes() {
     const text = document.createElement("div");
     text.className = "point-text";
     text.tabIndex = 0;
-    fillText(text, item.text);
+    fillText(text, item.text, () => beginLabel(item, text));
     text.addEventListener("click", (event) => {
-      if (event.target.closest("a")) return;
+      if (event.target.closest("a, button")) return;
       beginEdit(item, text);
     });
     text.addEventListener("keydown", (event) => {
@@ -2176,11 +2347,14 @@ function deliverReminders() {
   renderNotes();
 }
 
-function changeCount(step) {
+function changeCount(id, step) {
   const day = dayOf(viewDay);
-  const next = Math.max(0, day.count + step);
-  if (next === day.count) return;
-  day.count = next;
+  const current = countOf(viewDay, id);
+  const next = Math.max(0, current + step);
+  if (next === current) return;
+  if (id === MAIN_PROFILE) day.count = next;
+  else if (next) day.counts[id] = next;
+  else delete day.counts[id];
   saveNotes();
   keep(NOTE_OPEN_KEY, "1");
   renderNotes();
@@ -2200,9 +2374,6 @@ makeSortable(noteList, ".point", false, (ids) => {
   renderNotes();
 });
 
-countUp.addEventListener("click", () => changeCount(1));
-countDown.addEventListener("click", () => changeCount(-1));
-
 dayStrip.addEventListener("wheel", (event) => {
   if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
   event.preventDefault();
@@ -2219,12 +2390,17 @@ setInterval(() => {
   deliverReminders();
 }, 30 * 1000);
 
-function beginEdit(item, textButton) {
+function beginLabel(item, textButton) {
+  beginEdit(item, textButton, true);
+}
+
+function beginEdit(item, textButton, asLabel = false) {
   const input = document.createElement("input");
   input.type = "text";
   input.className = "point-edit";
-  input.value = item.text;
-  input.maxLength = 600;
+  input.value = asLabel ? "" : item.text;
+  input.placeholder = asLabel ? "What is this link for?" : "";
+  input.maxLength = asLabel ? 80 : 600;
   textButton.closest(".point").draggable = false;
   textButton.replaceWith(input);
   input.focus();
@@ -2235,7 +2411,7 @@ function beginEdit(item, textButton) {
     closed = true;
     if (save) {
       const next = input.value.trim();
-      if (next) item.text = next;
+      if (next) item.text = asLabel ? `${next} ${item.text}` : next;
     }
     saveNotes();
     renderNotes();
@@ -2730,7 +2906,7 @@ function restoreSaved() {
   who.textContent = stored(NAME_KEY) || "Adarsh";
   setBookmarksVisible(stored(SHOW_KEY) !== "0");
   setFocus(stored(FOCUS_KEY) === "1");
-  ({ days, pinned, lists, order: tabOrder } = loadNoteStore());
+  ({ days, pinned, lists, order: tabOrder, profiles } = loadNoteStore());
   renderNotes();
   study = readStudy();
   syncStudy();
@@ -2838,12 +3014,12 @@ chrome.storage?.onChanged?.addListener((changes, area) => {
 
 chrome.storage?.onChanged?.addListener((changes, area) => {
   if (area !== "local" || document.querySelector(".point-edit")) return;
-  const watched = [DAYS_KEY, PINNED_KEY, LISTS_KEY, TAB_ORDER_KEY, NOTE_OPEN_KEY];
+  const watched = [DAYS_KEY, PINNED_KEY, LISTS_KEY, TAB_ORDER_KEY, PROFILES_KEY, NOTE_OPEN_KEY];
   if (!watched.some((key) => changes[key])) return;
   for (const key of watched) {
     const next = changes[key]?.newValue;
     if (typeof next === "string" && next !== memory[key]) memory[key] = next;
   }
-  ({ days, pinned, lists, order: tabOrder } = loadNoteStore());
+  ({ days, pinned, lists, order: tabOrder, profiles } = loadNoteStore());
   renderNotes();
 });

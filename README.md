@@ -57,7 +57,7 @@ When the files change, open `chrome://extensions` and click the reload icon on *
 - **City** is one line: the name, the temperature, and a small sun, cloud, or rain mark in the same color as the text. × hides the chip and keeps the city.
 - **Note** keeps a tab for each day: Today, Yesterday, then dates. A new day starts at 4 AM.
   - Click the words to edit them. Tick a point when it is done. × on a point deletes only that point. **Hide** closes the card and keeps everything.
-  - Paste a link and it shows as a short clickable name.
+  - Paste a link and it shows as a short clickable name. Type a word before it, or click + label, to say what it is for.
   - The pin keeps a note on every day.
   - The arrow copies a note from an old day into Today. **Copy unticked to Today** copies all unfinished ones at once.
   - The bell brings a note back into Today tomorrow, in 3 days, in 1 week, or in 2 weeks.
@@ -65,6 +65,7 @@ When the files change, open `chrome://extensions` and click the reload icon on *
   - Drag tabs and notes to change their order.
   - Drag the card's edge or corner to resize it. Double-click the corner to reset the size.
 - **Applied jobs** counts with + and −. Beside it is the total for this week. Below are your streak, your best run of days, and the study time for that day.
+  - Click the name to rename it. + Profile adds up to 4 counters, such as Frontend and Backend. The day tab and streak use the total.
 - **Study** turns the big clock into a countdown: 25 min, 45 min, 1 hr, 1.5 hr, or your own minutes. Everything else still works. The minutes are saved on that day.
 - **Focus** leaves the clock, search, and shuffle, and hides the rest. **Exit** brings them back.
 - Drag the city chip or the notes card to any corner. Near an edge, they snap and stay there.

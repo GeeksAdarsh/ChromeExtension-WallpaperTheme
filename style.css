@@ -632,7 +632,7 @@ body.is-study #ampm {
   outline: none;
 }
 
-.count-row[hidden],
+.count-rows[hidden],
 .copy-open[hidden] {
   display: none;
 }
@@ -833,20 +833,124 @@ body.is-study #ampm {
   outline: none;
 }
 
-.count-row {
+.count-rows {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 2px;
   margin-bottom: 8px;
-  padding: 4px 4px 4px 2px;
+  padding-bottom: 4px;
   border-bottom: 1px solid var(--line);
 }
 
+.count-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 4px 3px 2px;
+}
+
+.count-head {
+  display: inline-flex;
+  align-items: baseline;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .count-label {
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--muted);
   font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  cursor: text;
+  flex-shrink: 0;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count-head .count-week {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+}
+
+.count-label:hover,
+.count-label:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.count-name {
+  width: 130px;
+  padding: 0 0 2px;
+  border: 0;
+  border-bottom: 1px solid var(--edge);
+  background: none;
+  color: var(--ink);
+  font: 400 11px/1 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.count-remove {
+  position: absolute;
+  top: 50%;
+  right: -14px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.count-row:hover .count-remove,
+.count-remove:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.count-remove:hover {
+  color: var(--ink);
+}
+
+.count-add {
+  align-self: flex-start;
+  margin: 2px 0 0 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--faint);
+  font: 400 11px/1.2 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+#note-wrap:hover .count-add,
+.count-add:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.count-add:hover {
+  color: var(--ink);
 }
 
 .count-tools {
@@ -892,6 +996,44 @@ body.is-study #ampm {
   text-decoration: underline;
   text-decoration-color: var(--edge);
   text-underline-offset: 2px;
+}
+
+.point-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+
+.point-links.is-under {
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.point-links.is-under .point-link {
+  color: var(--muted);
+}
+
+.point-label-add {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--faint);
+  font: 400 11px/1.2 "Outfit", "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.point:hover .point-label-add,
+.point-label-add:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.point-label-add:hover {
+  color: var(--ink);
 }
 
 .point-link:hover,
